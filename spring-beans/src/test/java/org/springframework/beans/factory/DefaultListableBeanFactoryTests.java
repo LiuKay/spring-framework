@@ -16,6 +16,18 @@
 
 package org.springframework.beans.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import java.io.Closeable;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -39,15 +51,12 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import javax.annotation.Priority;
 import javax.security.auth.Subject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.NotWritablePropertyException;
@@ -102,18 +111,6 @@ import org.springframework.core.testfixture.security.TestPrincipal;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringValueResolver;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 /**
  * Tests properties population and autowire behavior.
@@ -1392,12 +1389,16 @@ class DefaultListableBeanFactoryTests {
 
 	@Test
 	void dependsOnCycle() {
+		//tb1 -> tb2
 		RootBeanDefinition bd1 = new RootBeanDefinition(TestBean.class);
 		bd1.setDependsOn("tb2");
 		lbf.registerBeanDefinition("tb1", bd1);
+
+		//tb2 ->tb1
 		RootBeanDefinition bd2 = new RootBeanDefinition(TestBean.class);
 		bd2.setDependsOn("tb1");
 		lbf.registerBeanDefinition("tb2", bd2);
+
 		assertThatExceptionOfType(BeanCreationException.class).isThrownBy(() ->
 				lbf.preInstantiateSingletons())
 			.withMessageContaining("Circular")
