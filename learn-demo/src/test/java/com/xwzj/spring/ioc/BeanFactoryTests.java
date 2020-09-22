@@ -1,18 +1,20 @@
 package com.xwzj.spring.ioc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import com.xwzj.spring.model.Person;
 import com.xwzj.spring.po.Student;
 import com.xwzj.spring.po.Teacher;
+import com.xwzj.spring.po.TestObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BeanFactoryTests {
 
@@ -64,5 +66,19 @@ public class BeanFactoryTests {
 		Student student = context.getBean("student", Student.class);
 		Teacher teacher = context.getBean("teacher", Teacher.class);
 		assertEquals(teacher, student.getTeacher());
+	}
+
+	@Test
+	void testIOCInjection() {
+
+		BeanFactory beanFactory = new ClassPathXmlApplicationContext("ioc\\ioc-Injection-demo.xml");
+
+		TestObject bean = beanFactory.getBean(TestObject.class);
+
+		//the two ioc container is not same
+		assertNotSame(beanFactory,bean.getBeanFactory());
+
+		ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) beanFactory;
+		assertSame(applicationContext.getBeanFactory(), bean.getBeanFactory());
 	}
 }

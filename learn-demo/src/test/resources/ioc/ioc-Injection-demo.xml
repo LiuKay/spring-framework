@@ -4,12 +4,6 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
         https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="kay" class="com.xwzj.spring.model.Person">
-		<property name="name" value="kay"/>
-		<property name="age" value="18"/>
-		<property name="job" value="Java"/>
-	</bean>
-
 	<bean id="testObject" class="com.xwzj.spring.po.TestObject" autowire="byType"/>
 
 </beans>
